@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct BarcodeScannerView: View {
-    @State private var scannedBarcode = ""
+    @StateObject var viewModel = BarcodeScannerViewModel()
     
     var body: some View {
         NavigationView {
             VStack {
-                ScannerView(scannedBarcode: $scannedBarcode)
+                ScannerView(scannedBarcode: $viewModel.scannedBarcode, alertItem: $viewModel.alertItem)
                     .frame(maxWidth: .infinity, maxHeight: 300)
                 
                 Spacer().frame(height: 60)
@@ -21,13 +21,18 @@ struct BarcodeScannerView: View {
                 Label("Scanned Barcode:", systemImage: "barcode.viewfinder")
                     .font(.title)
                 
-                Text(scannedBarcode.isEmpty ? "Not yet scanned" : scannedBarcode)
+                Text(viewModel.statusText)
                     .bold()
                     .font(.largeTitle)
-                    .foregroundColor(scannedBarcode.isEmpty ? .red : .green)
+                    .foregroundColor(viewModel.statusTextColor)
                     .padding()
             }
             .navigationTitle("Barcode Scanner")
+            .alert(item: $viewModel.alertItem) { alertItem in
+                Alert(title: Text(alertItem.title),
+                      message: Text(alertItem.message),
+                      dismissButton: alertItem.dismissButton)
+            }
         }
     }
 }
